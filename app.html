@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrinkCount - Standard drinks</title>
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#13241f; color:#e9f5f0; line-height:1.5; }
+  .wrap { max-width:660px; margin:0 auto; padding:26px 18px 60px; }
+  a { color:#7de3b8; } h1 { font-size:28px; } h1 span { color:#7de3b8; } .sub { color:#9fbdb1; margin:4px 0 18px; }
+  .card { background:#1d3830; border-radius:14px; padding:16px; margin-bottom:14px; }
+  label { display:block; font-size:13px; color:#9fbdb1; margin:10px 0 4px; }
+  input, select { width:100%; padding:11px; border-radius:9px; border:1px solid #2f5649; background:#13241f; color:#e9f5f0; font-size:16px; }
+  .row { display:flex; gap:10px; } .row > div { flex:1; }
+  .btn { padding:12px 16px; border-radius:10px; border:0; background:#7de3b8; color:#10231c; font-weight:700; font-size:15px; cursor:pointer; width:100%; margin-top:12px; }
+  .chips { display:flex; flex-wrap:wrap; gap:8px; margin-top:8px; } .chip { padding:8px 12px; border-radius:99px; border:1px solid #2f5649; background:#13241f; color:#cfe6dc; font-size:14px; cursor:pointer; }
+  .big { font-size:40px; font-weight:800; color:#7de3b8; } .lbl { font-size:13px; color:#9fbdb1; }
+  .note { font-size:14px; color:#cfe6dc; margin-top:10px; } h2 { font-size:17px; margin-bottom:8px; }
+  .pill { display:inline-block; padding:5px 12px; border-radius:99px; font-weight:700; font-size:14px; margin-top:6px; } .within { background:#2f7d5a; color:#fff; } .at { background:#e6c84a; color:#2b2400; } .over { background:#d2493f; color:#fff; }
+  table { width:100%; border-collapse:collapse; font-size:14px; } td, th { padding:6px 4px; border-bottom:1px solid #2a4a3f; text-align:left; } th { color:#9fbdb1; font-weight:600; }
+  .x { background:none; border:0; color:#9fbdb1; cursor:pointer; font-size:16px; }
+  .small { font-size:13px; color:#9fbdb1; } .warn { background:#3d2a20; border:1px solid #b9703f; color:#ffddc4; padding:12px; border-radius:10px; margin-top:12px; font-size:14px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Drink<span>Count</span></h1>
+  <div class="sub">Turn any glass, can or bottle into standard drinks, and keep a tally against the NIAAA limits.</div>
+  <div class="card">
+    <h2>What is in the glass?</h2>
+    <div class="chips" id="presets"></div>
+    <div class="row"><div><label for="vol">Size</label><input id="vol" type="number" min="0" step="any" value="12"></div><div style="max-width:100px"><label for="unit">Unit</label><select id="unit"><option value="floz">fl oz</option><option value="ml">ml</option></select></div><div><label for="abv">Alcohol (% ABV)</label><input id="abv" type="number" min="0" max="100" step="0.1" value="5"></div></div>
+    <div class="row"><div><label for="qty">How many</label><input id="qty" type="number" min="1" step="1" value="1"></div></div>
+    <div id="one" style="margin-top:10px"></div>
+    <button class="btn" id="add">Add to today</button>
+  </div>
+  <div class="card">
+    <h2>Today</h2>
+    <table id="log"></table>
+    <div class="row"><div><label for="prof">Limits for</label><select id="prof"><option value="women">Women (3 a day, 7 a week)</option><option value="men">Men (4 a day, 14 a week)</option><option value="over65">Anyone 65 or older (3 a day, 7 a week)</option></select></div><div><label for="week">Earlier this week (drinks)</label><input id="week" type="number" min="0" step="0.5" value="0"></div></div>
+    <div id="sum"></div>
+  </div>
+  <div class="card"><h2>About this</h2><div class="small">One US standard drink is about 14 g (0.6 fl oz) of pure alcohol: 12 fl oz of 5% beer, 5 fl oz of 12% wine, 1.5 fl oz of 40% spirits. Other countries define a unit differently. The limits are NIAAA low-risk limits, which are not a safe level and do not mean it is safe to drive. People who are pregnant, on medication, or with health conditions should drink less or not at all. Not medical advice. Sources: <a href="https://www.niaaa.nih.gov/alcohols-effects-health/what-standard-drink">NIAAA, what is a standard drink</a>, <a href="https://arcr.niaaa.nih.gov/volume/39/1/drinking-patterns-and-their-definitions">NIAAA, drinking patterns and their definitions</a>. <a href="index.html">About</a></div></div>
+</div>
+<script src="engine.js"></script>
+<script>
+var $ = function (i) { return document.getElementById(i); }, items = [];
+var PRESETS = [['Beer 12 oz', 12, 'floz', 5], ['Wine 5 oz', 5, 'floz', 12], ['Shot 1.5 oz', 1.5, 'floz', 40], ['Pint 500 ml', 500, 'ml', 4.5], ['Wine bottle 750 ml', 750, 'ml', 13.5], ['Hard seltzer 12 oz', 12, 'floz', 5], ['IPA 12 oz', 12, 'floz', 7]];
+PRESETS.forEach(function (p) { var b = document.createElement('button'); b.className = 'chip'; b.textContent = p[0]; b.onclick = function () { $('vol').value = p[1]; $('unit').value = p[2]; $('abv').value = p[3]; one(); }; $('presets').appendChild(b); });
+function cur() { var v = parseFloat($('vol').value), a = parseFloat($('abv').value), q = parseInt($('qty').value, 10); if (!(v > 0) || isNaN(a) || a < 0 || a > 100 || !(q >= 1)) return null; return { vol: v, unit: $('unit').value, abv: a, qty: q, sd: Drink.stdDrinks(Drink.toMl(v, $('unit').value), a) * q }; }
+function one() { var c = cur(); $('one').innerHTML = c ? '<div class="lbl">That is</div><div class="big" id="sd">' + (Drink.round1(c.sd) === 1 ? '1.0' : Drink.round1(c.sd).toFixed(1)) + ' standard drink' + (Math.abs(c.sd - 1) < 0.05 ? '' : 's') + '</div><div class="note">' + (Drink.grams(Drink.toMl(c.vol, c.unit), c.abv) * c.qty).toFixed(0) + ' g of pure alcohol</div>' : '<div class="lbl">Enter a size, an alcohol percentage between 0 and 100, and a count.</div>'; }
+function total() { var t = 0; items.forEach(function (i) { t += i.sd; }); return t; }
+function render() {
+  var h = '<tr><th>Drink</th><th>Std</th><th></th></tr>';
+  items.forEach(function (it, i) { h += '<tr><td>' + it.qty + ' &times; ' + it.vol + ' ' + (it.unit === 'floz' ? 'fl oz' : 'ml') + ' at ' + it.abv + '%</td><td>' + it.sd.toFixed(1) + '</td><td><button class="x" data-i="' + i + '" aria-label="Remove">&times;</button></td></tr>'; });
+  if (!items.length) h += '<tr><td colspan="3" class="small">Nothing added yet.</td></tr>';
+  $('log').innerHTML = h;
+  var bs = $('log').querySelectorAll('.x'); for (var k = 0; k < bs.length; k++) bs[k].onclick = function () { items.splice(parseInt(this.getAttribute('data-i'), 10), 1); render(); };
+  var wk = parseFloat($('week').value); if (isNaN(wk) || wk < 0) wk = 0;
+  var t = total(), r = Drink.check($('prof').value, t, wk), L = r.limits;
+  var s = '<div class="lbl" style="margin-top:12px">Today</div><div class="big" id="tot">' + t.toFixed(1) + '</div><span class="pill ' + r.status + '" id="status">' + (r.status === 'within' ? 'Within NIAAA low-risk limits' : r.status === 'at' ? 'At a limit' : 'Over a limit') + '</span>';
+  s += '<div class="note" id="left">Today: ' + t.toFixed(1) + ' of ' + L.day + '. This week: ' + r.week.toFixed(1) + ' of ' + L.week + '.' + (r.status !== 'over' ? ' Room left today ' + r.dayLeft.toFixed(1) + ', this week ' + r.weekLeft.toFixed(1) + '.' : '') + '</div>';
+  if (r.binge) s += '<div class="warn" id="binge">That is a binge-drinking amount if it happened within about 2 hours.</div>';
+  s += '<div class="warn" id="drive" style="background:#2b2e22">Never use this to decide whether you can drive. Any alcohol can impair you.</div>';
+  $('sum').innerHTML = s;
+}
+['vol', 'unit', 'abv', 'qty'].forEach(function (i) { $(i).oninput = one; $(i).onchange = one; });
+['prof', 'week'].forEach(function (i) { $(i).oninput = render; $(i).onchange = render; });
+$('add').onclick = function () { var c = cur(); if (!c) return; items.push(c); render(); };
+one(); render();
+</script>
+</body>
+</html>
