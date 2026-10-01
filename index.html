@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DrinkCount - Standard drinks</title>
+<meta name="description" content="Convert any drink to US standard drinks and track a day against NIAAA low-risk limits. Runs in your browser.">
+<style>
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif; background:#13241f; color:#e9f5f0; line-height:1.6; }
+  .wrap { max-width:690px; margin:0 auto; padding:48px 20px 60px; }
+  .logo { font-size:46px; font-weight:800; } .logo span { color:#7de3b8; }
+  .tag { font-size:19px; margin-top:10px; color:#cfe6dc; }
+  .cta { display:inline-block; margin-top:26px; background:#7de3b8; color:#10231c; font-weight:700; padding:14px 30px; border-radius:12px; text-decoration:none; }
+  h2 { font-size:21px; margin:40px 0 10px; } p, li { color:#a9c7bb; margin-bottom:8px; } ul { margin-left:20px; }
+  .demo { margin-top:26px; background:#1d3830; border-radius:14px; padding:18px; display:flex; gap:18px; flex-wrap:wrap; }
+  .demo div { flex:1; min-width:140px; } .demo b { display:block; font-size:30px; color:#7de3b8; }
+  footer { margin-top:50px; font-size:13px; color:#7f9d91; } a { color:#7de3b8; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="logo">Drink<span>Count</span></div>
+  <div class="tag">A pint, a craft IPA and a bottle of wine are not the same number of drinks. DrinkCount does the math, so you can see what you actually had.</div>
+  <a class="cta" href="app.html">Count my drinks &rarr;</a>
+  <div class="demo"><div><b>5.7</b>standard drinks in a 750 ml bottle of 13.5% wine</div><div><b>2.0</b>a 12 oz beer at 10% is two, not one</div><div><b>14 g</b>pure alcohol in one US standard drink</div></div>
+  <h2>What you get</h2>
+  <ul>
+    <li>Any size in fl oz or ml, any strength, converted to standard drinks and grams of alcohol</li>
+    <li>One-tap presets for beer, wine, shots, a pint, a bottle</li>
+    <li>A running tally for today against the NIAAA daily and weekly low-risk limits</li>
+    <li>A binge-amount warning, and a plain reminder not to use any of this for driving decisions</li>
+  </ul>
+  <footer>Information only, not medical advice, and not a way to judge fitness to drive. Sources: <a href="https://www.niaaa.nih.gov/alcohols-effects-health/what-standard-drink">NIAAA standard drink</a>, <a href="https://arcr.niaaa.nih.gov/volume/39/1/drinking-patterns-and-their-definitions">NIAAA drinking patterns</a><br>App Factory project. <a href="https://github.com/iLanis-agent/drinkcount">Code</a></footer>
+</div>
+</body>
+</html>
